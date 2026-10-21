@@ -30,7 +30,9 @@ CopyCheck 判断的不是「你按了键」，而是 **Windows 的剪贴板序�
 
 ## 安装
 
-下载 `CopyCheck.exe`，双击运行。不需要安装，不需要 .NET 运行时，单文件绿色版。
+**[下载 CopyCheck.exe](https://github.com/adam0718/copycheck/releases/latest)**，双击运行。
+
+37KB 单文件绿色版，不需要安装，不需要 .NET 运行时（Windows 10 1809+ / Windows 11 系统自带 .NET Framework 4.8）。
 
 启动后常驻托盘，右键托盘图标可以：
 
