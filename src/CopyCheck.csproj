@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+
+    <!-- 目标 .NET Framework 4.8：Win10 1809+ / Win11 系统自带，无需安装运行时，
+         且能产出真正的单文件小 exe（不像 .NET 8 单文件那样自解压，会触发 Smart App Control）。 -->
+    <TargetFramework>net48</TargetFramework>
+
+    <UseWindowsForms>true</UseWindowsForms>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+
+    <!-- net48 没有 SDK 的隐式 using，各文件手动引入 -->
+    <ImplicitUsings>disable</ImplicitUsings>
+
+    <AssemblyName>CopyCheck</AssemblyName>
+    <RootNamespace>CopyCheck</RootNamespace>
+    <Product>CopyCheck 复制核对</Product>
+    <Company>adam0718</Company>
+    <Description>复制后确认剪贴板是否真的写入成功，并显示内容预览</Description>
+    <Version>0.1.0</Version>
+    <FileVersion>0.1.0.0</FileVersion>
+    <Copyright>MIT License</Copyright>
+
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon></ApplicationIcon>
+
+    <!-- 生成单一 exe，依赖全部内嵌 -->
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- 让 SDK 能找到 net48 的引用程序集，不需要装 Visual Studio -->
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>
