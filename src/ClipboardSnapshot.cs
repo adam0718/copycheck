@@ -114,9 +114,11 @@ internal sealed class ClipboardSnapshot
 
             return new ClipboardSnapshot
             {
-                Kind = ClipKind.Text,
-                Preview = "（空文本）",
-                CountLabel = "0 字",
+                // 有文本格式但内容为空，对用户来说和「剪贴板是空的」没有区别：
+                // 都是没有东西可粘贴。归为 Empty，才能触发「内容是空的」提示。
+                Kind = ClipKind.Empty,
+                Preview = "剪贴板是空的",
+                CountLabel = "空",
                 Signature = "T|empty"
             };
         }

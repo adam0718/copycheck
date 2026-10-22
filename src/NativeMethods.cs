@@ -18,6 +18,7 @@ internal static class NativeMethods
     internal const int VK_MENU = 0x12;   // Alt
     internal const int VK_C = 0x43;
     internal const int VK_X = 0x58;
+    internal const int VK_V = 0x56;
 
     internal delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
 

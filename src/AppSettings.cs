@@ -10,6 +10,12 @@ internal sealed class AppSettings
     /// <summary>终端里 Ctrl+C 是中断信号，默认排除，避免天天误报。</summary>
     public bool ExcludeTerminals { get; set; } = true;
 
+    /// <summary>检测没有按键的剪贴板写入（右键菜单复制、程序内复制按钮等）。</summary>
+    public bool DetectPassiveCopy { get; set; } = true;
+
+    /// <summary>Ctrl+V 时是否提示。</summary>
+    public bool ShowPasteToast { get; set; } = true;
+
     public int LocalThresholdMs { get; set; } = 450;
     public int RemoteThresholdMs { get; set; } = 1200;
     public int ExtendedWindowMs { get; set; } = 2600;
@@ -49,6 +55,16 @@ internal sealed class AppSettings
                             val.Equals("true", StringComparison.OrdinalIgnoreCase);
                         break;
 
+                    case "DetectPassiveCopy":
+                        settings.DetectPassiveCopy = val == "1" ||
+                            val.Equals("true", StringComparison.OrdinalIgnoreCase);
+                        break;
+
+                    case "ShowPasteToast":
+                        settings.ShowPasteToast = val == "1" ||
+                            val.Equals("true", StringComparison.OrdinalIgnoreCase);
+                        break;
+
                     case "LocalThresholdMs":
                         if (int.TryParse(val, out int local) && local > 0)
                             settings.LocalThresholdMs = local;
@@ -83,7 +99,11 @@ internal sealed class AppSettings
             {
                 "# CopyCheck 配置",
                 "# ExcludeTerminals: 1=跳过终端窗口（终端里 Ctrl+C 是中断信号）",
+                "# DetectPassiveCopy: 1=检测右键菜单复制等没有快捷键的写入",
+                "# ShowPasteToast: 1=按 Ctrl+V 时提示",
                 $"ExcludeTerminals={(ExcludeTerminals ? 1 : 0)}",
+                $"DetectPassiveCopy={(DetectPassiveCopy ? 1 : 0)}",
+                $"ShowPasteToast={(ShowPasteToast ? 1 : 0)}",
                 $"LocalThresholdMs={LocalThresholdMs}",
                 $"RemoteThresholdMs={RemoteThresholdMs}",
                 $"ExtendedWindowMs={ExtendedWindowMs}"

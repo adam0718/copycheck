@@ -19,8 +19,8 @@
     <Product>CopyCheck 复制核对</Product>
     <Company>adam0718</Company>
     <Description>复制后确认剪贴板是否真的写入成功，并显示内容预览</Description>
-    <Version>0.1.0</Version>
-    <FileVersion>0.1.0.0</FileVersion>
+    <Version>0.2.0</Version>
+    <FileVersion>0.2.0.0</FileVersion>
     <Copyright>MIT License</Copyright>
 
     <ApplicationManifest>app.manifest</ApplicationManifest>

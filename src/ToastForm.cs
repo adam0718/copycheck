@@ -31,6 +31,7 @@ internal sealed class ToastForm : Form
     private int _holdMs = 1500;
 
     // 当前展示的内容
+    private KeyAction _action = KeyAction.Copy;
     private CopyOutcome _outcome = CopyOutcome.Success;
     private string _title = "";
     private string _preview = "";
@@ -119,14 +120,22 @@ internal sealed class ToastForm : Form
     private void ApplyContent(CopyResult r)
     {
         _outcome = r.Outcome;
+        _action = r.Action;
 
         switch (r.Outcome)
         {
             case CopyOutcome.Success:
-                _title = "已复制";
+                _title = SuccessTitle(r.Action);
                 _preview = r.Snapshot?.Preview ?? "";
                 _label = r.Snapshot?.CountLabel ?? "";
-                _holdMs = 1500;
+                _holdMs = r.Action == KeyAction.Paste ? 1100 : 1500;
+                break;
+
+            case CopyOutcome.EmptyContent:
+                _title = EmptyContentTitle(r.Action);
+                _preview = r.Hint ?? "没有选中任何内容，或当前程序没往剪贴板写数据";
+                _label = "";
+                _holdMs = 2200;
                 break;
 
             case CopyOutcome.Unchanged:
@@ -144,7 +153,7 @@ internal sealed class ToastForm : Form
                 break;
 
             case CopyOutcome.Failed:
-                _title = "未复制成功";
+                _title = FailureTitle(r.Action);
                 _preview = r.Hint ?? "";
                 _label = "";
                 _holdMs = 2800;
@@ -152,13 +161,46 @@ internal sealed class ToastForm : Form
         }
     }
 
-    private Color AccentColor => _outcome switch
+    private static string SuccessTitle(KeyAction action) => action switch
     {
-        CopyOutcome.Success => Color.FromArgb(52, 211, 153),
-        CopyOutcome.Unchanged => Color.FromArgb(251, 191, 36),
-        CopyOutcome.Pending => Color.FromArgb(148, 163, 184),
-        _ => Color.FromArgb(248, 113, 113)
+        KeyAction.Cut => "已剪切",
+        KeyAction.Paste => "已粘贴",
+        _ => "已复制"
     };
+
+    private static string FailureTitle(KeyAction action) => action switch
+    {
+        KeyAction.Cut => "未剪切成功",
+        KeyAction.Paste => "没有可粘贴的内容",
+        _ => "未复制成功"
+    };
+
+    private static string EmptyContentTitle(KeyAction action) => action switch
+    {
+        KeyAction.Cut => "剪切的内容是空的",
+        KeyAction.Paste => "剪贴板是空的",
+        _ => "复制的内容是空的"
+    };
+
+    private Color AccentColor
+    {
+        get
+        {
+            // 粘贴用蓝色：它表示「你粘的是这个」，不是「粘贴成功了」。
+            // 外部无法确认目标程序是否真的接收，所以不能用代表成功的绿色。
+            if (_outcome == CopyOutcome.Success && _action == KeyAction.Paste)
+                return Color.FromArgb(96, 165, 250);
+
+            return _outcome switch
+            {
+                CopyOutcome.Success => Color.FromArgb(52, 211, 153),
+                CopyOutcome.Unchanged => Color.FromArgb(251, 191, 36),
+                CopyOutcome.EmptyContent => Color.FromArgb(251, 191, 36),
+                CopyOutcome.Pending => Color.FromArgb(148, 163, 184),
+                _ => Color.FromArgb(248, 113, 113)
+            };
+        }
+    }
 
     // ---------- 尺寸与定位 ----------
     private void RecalcLayout()
@@ -316,6 +358,19 @@ internal sealed class ToastForm : Form
             LineJoin = LineJoin.Round
         };
 
+        // 粘贴用向下箭头，和复制的对勾区分开
+        if (_outcome == CopyOutcome.Success && _action == KeyAction.Paste)
+        {
+            g.DrawLine(pen, cx, cy - u * 0.9f, cx, cy + u * 0.55f);
+            g.DrawLines(pen, new[]
+            {
+                new PointF(cx - u * 0.6f, cy + u * 0.05f),
+                new PointF(cx, cy + u * 0.75f),
+                new PointF(cx + u * 0.6f, cy + u * 0.05f)
+            });
+            return;
+        }
+
         switch (_outcome)
         {
             case CopyOutcome.Success:
@@ -338,6 +393,16 @@ internal sealed class ToastForm : Form
                 // 等号
                 g.DrawLine(pen, cx - u * 0.8f, cy - u * 0.35f, cx + u * 0.8f, cy - u * 0.35f);
                 g.DrawLine(pen, cx - u * 0.8f, cy + u * 0.35f, cx + u * 0.8f, cy + u * 0.35f);
+                break;
+
+            case CopyOutcome.EmptyContent:
+                // 感叹号
+                g.DrawLine(pen, cx, cy - u * 0.75f, cx, cy + u * 0.2f);
+                using (var dot = new SolidBrush(color))
+                {
+                    float dr = Math.Max(1.3f, u * 0.15f);
+                    g.FillEllipse(dot, cx - dr, cy + u * 0.55f, dr * 2, dr * 2);
+                }
                 break;
 
             default:
